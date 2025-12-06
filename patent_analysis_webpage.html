@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Patent Distribution Analysis - 2015</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c4f76 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: #1e3a5f;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        .map-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .map-section h2 {
+            color: #1e3a5f;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .analysis-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .analysis-section h2 {
+            color: #1e3a5f;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2c4f76;
+            padding-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c4f76 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analysis-content {
+            color: #444;
+            font-size: 1.1em;
+            text-align: justify;
+            line-height: 1.8;
+        }
+
+        .analysis-content p {
+            margin-bottom: 20px;
+        }
+
+        .top-regions {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .top-regions h3 {
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            text-align: center;
+        }
+
+        .region-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 2px solid #dee2e6;
+            transition: all 0.3s ease;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+
+        .region-item:hover {
+            background: #e3f2fd;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .region-item:last-child {
+            border-bottom: none;
+        }
+
+        .region-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1e3a5f;
+            margin-right: 15px;
+        }
+
+        .region-name {
+            flex: 1;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .region-patents {
+            color: #1e3a5f;
+            font-weight: bold;
+            font-size: 1.1em;
+            background: #e3f2fd;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .key-findings {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .key-findings h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .key-findings ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .key-findings li {
+            margin-bottom: 8px;
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            color: #666;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer strong {
+            color: #1e3a5f;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .region-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .region-rank {
+                margin-right: 0;
+            }
+
+            .map-container {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>United States Patent Distribution Analysis</h1>
+            <p class="subtitle">Metropolitan Statistical Areas • 2015 Utility Patent Grants</p>
+        </header>
+
+        <div class="map-section">
+            <h2>Interactive Visualization</h2>
+            <div class="map-container">
+                <iframe src="patent_distribution_map_2015_final.html"></iframe>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: #666; font-style: italic;">
+                Hover over bubbles for detailed information • Larger bubbles indicate higher patent counts
+            </p>
+        </div>
+
+        <div class="analysis-section">
+            <h2>Regional Trends in Patent Distribution</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">50</div>
+                    <div class="stat-label">MSAs Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">110,306</div>
+                    <div class="stat-label">Total Patents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">14,618</div>
+                    <div class="stat-label">Highest MSA Count</div>
+                </div>
+            </div>
+
+            <div class="key-findings">
+                <h3>Key Findings</h3>
+                <ul>
+                    <li><strong>Silicon Valley Dominance:</strong> Bay Area MSAs account for 22% of top 50 patent output</li>
+                    <li><strong>Coastal Concentration:</strong> West and East Coast MSAs dominate top 10 rankings</li>
+                    <li><strong>Emerging Hubs:</strong> Austin, Denver and Raleigh show strong innovation growth</li>
+                    <li><strong>Top 5 Concentration:</strong> Five MSAs account for over 40% of all patents analyzed</li>
+                </ul>
+            </div>
+
+            <div class="analysis-content">
+                <p>
+                    The 2015 patent distribution data reveals a striking geographic concentration of innovation in the United States. The San Francisco Bay Area dominates the patent landscape, with San Jose-Sunnyvale-Santa Clara leading at 14,618 patents, followed closely by San Francisco-Oakland-Fremont with 9,732 patents. This Silicon Valley concentration represents nearly 22% of the top 50 MSAs' patent output, highlighting California's role as the nation's primary innovation engine.
+                </p>
+                <p>
+                    A clear coastal bias emerges when examining regional patterns. The West Coast accounts for six of the top ten MSAs, while the East Coast contributes three, with only one Midwest representative (Chicago) breaking into the top tier. Major technology hubs like Seattle (4,739 patents), San Diego (5,460 patents) and Boston (5,949 patents) demonstrate sustained innovation capacity beyond Silicon Valley. The New York metropolitan area, despite its financial and corporate headquarters concentration, ranks third with 7,754 patents, suggesting diverse innovation beyond traditional tech sectors.
+                </p>
+                <p>
+                    The middle tier reveals emerging innovation centers in Austin (2,700 patents), Denver (1,202 patents) and Raleigh (1,535 patents), indicating a gradual geographic diversification of patent activity. However, the data underscores persistent regional disparities, with the top five MSAs accounting for over 40% of all patents among the top 50 regions. This concentration suggests that infrastructure, talent pools, venture capital access and established innovation ecosystems continue to reinforce advantages in traditional tech hubs, presenting both opportunities and challenges for economic development policy nationwide.
+                </p>
+            </div>
+
+            <div class="top-regions">
+                <h3>Top 5 Metropolitan Areas by Patent Activity</h3>
+                <div class="region-item">
+                    <span class="region-rank">1</span>
+                    <span class="region-name">San Jose-Sunnyvale-Santa Clara, CA</span>
+                    <span class="region-patents">14,618 patents</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-rank">2</span>
+                    <span class="region-name">San Francisco-Oakland-Fremont, CA</span>
+                    <span class="region-patents">9,732 patents</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-rank">3</span>
+                    <span class="region-name">New York-Northern New Jersey-Long Island, NY-NJ-PA</span>
+                    <span class="region-patents">7,754 patents</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-rank">4</span>
+                    <span class="region-name">Los Angeles-Long Beach-Santa Ana, CA</span>
+                    <span class="region-patents">6,476 patents</span>
+                </div>
+                <div class="region-item">
+                    <span class="region-rank">5</span>
+                    <span class="region-name">Boston-Cambridge-Quincy, MA-NH</span>
+                    <span class="region-patents">5,949 patents</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Data Source:</strong> United States Patent and Trademark Office (USPTO)</p>
+            <p>Patent Technology Monitoring Team (PTMT) • 2015 Utility Patent Grants</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Data represents utility patent grants distributed by calendar year with patent origin based on residence of first-named inventor</p>
+        </footer>
+    </div>
+</body>
+</html>
